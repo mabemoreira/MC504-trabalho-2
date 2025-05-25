@@ -34,8 +34,8 @@ int main() {
     char chave[256] =    "aaaaaaaaa";
     unsigned char cifrada[256], decifrada[256];
    
-    set_mensagem_cifrada(mensagem, chave, cifrada, strlen(mensagem), strlen(chave));
-    get_mensagem_original(cifrada, chave, decifrada, strlen(mensagem), strlen(chave));
+    set_mensagem_cifrada(mensagem, chave, cifrada, 9, 9);
+    get_mensagem_original(cifrada, chave, decifrada, 9, 9);
 
     return 0;
 }
