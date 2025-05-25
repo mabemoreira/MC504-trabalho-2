@@ -2,27 +2,172 @@
 #include <stdlib.h>
 #include <string.h>
 
-void set_mensagem_cifrada(char *mensagem,  char *chave, char *cifrada, size_t tamanho_mensagem, size_t tamanho_chave) {
-    if (tamanho_chave < tamanho_mensagem) {
+void set_mensagem_cifrada(unsigned char *mensagem,unsigned  char *chave, unsigned char *cifrada, unsigned long tamanho_cifrada, unsigned long tamanho_chave) {
+    
+    if (tamanho_chave < tamanho_cifrada) {
+    fprintf(stderr, "Erro: chave menor que a mensagem.\n");
+    exit(EXIT_FAILURE);
+    }
+
+
+    void *kmensagem;
+    void kmensagem = kmalloc(tamanho_cifrada, GFP_KERNEL);
+    if (!kmensagem)
+        return -ENOMEM;
+    if (copy_from_user(kmensagem, mensagem, tamanho_cifrada))
+        return -EFAULT;
+
+    void *kchave;
+    void kchave = kmalloc(tamanho_cifrada, GFP_KERNEL);
+    if (!kchave)
+        return -ENOMEM;
+    if (copy_from_user(kchave, chave, tamanho_cifrada))
+        return -EFAULT;
+
+    void *kcifrada;
+    void kcifrada = kmalloc(tamanho_cifrada, GFP_KERNEL);
+    if (!kcifrada)
+        return -ENOMEM;
+    if (copy_from_user(kcifrada, cifrada, tamanho_cifrada))
+        return -EFAULT;
+
+
+    for (unsigned long i = 0; i < tamanho_cifrada; i++) {
+        kcifrada[i] = kmensagem[i] ^ kchave[i];
+    }
+
+    if(copy_to_user(cifrada, kcifrada, tamanho_cifrada))
+        return -EFAULT;
+
+
+
+    kfree(kmensagem);
+    kfree(kchave);
+    kfree(kcifrada);
+
+}
+
+void get_mensagem_original(char *cifrada, char *chave, char *mensagem_decifrada, unsigned long tamanho_cifrada, unsigned long tamanho_chave) {
+    if (tamanho_chave < tamanho_cifrada) {
         fprintf(stderr, "Erro: chave menor que a mensagem.\n");
         exit(EXIT_FAILURE);
     }
-    for (size_t i = 0; i < tamanho_mensagem; i++) {
-        cifrada[i] = mensagem[i] ^ chave[i];
+
+    void *kcifrada;
+    kcifrada = kmalloc(tamanho_cifrada, GFP_KERNEL);
+    if (!kcifrada)
+        return -ENOMEM;
+    if (copy_from_user(kcifrada, cifrada, tamanho_cifrada))
+        return -EFAULT;
+
+    void *kchave;
+    kchave = kmalloc(tamanho_chave GFP_KERNEL);
+    if (!kchave)
+        return -ENOMEM;
+    if (copy_from_user(kchave, chave, tamanho_cifrada))
+        return -EFAULT;
+    
+    void *kmensagem;
+    kmensagem = kmalloc(tamanho_cifrada, GFP_KERNEL);
+    if (!kmensagem)
+        return -ENOMEM;
+
+    
+    for (size_t i = 0; i < tamanho_cifrada; i++) {
+        kmensagem[i] = kcifrada[i] ^ kchave[i];
     }
+    kmensagem[tamanho_cifrada] = '\0';
+
+    if(copy_to_user(mensagem_decifrada, kmensagem, tamanho_cifrada))
+        return -EFAULT;
+    kfree(kcifrada);
+    kfree(kchave);
+    kfree(kmensagem);
 }
 
-void get_mensagem_original(char *cifrada, char *chave, char *mensagem, size_t tamanho_mensagem, size_t tamanho_chave) {
-    if (tamanho_chave < tamanho_mensagem) {
+ SYSCALL_DEFINE5(set_mensagem_cifrada, void __user *, mensagem, void __user *, chave, 
+    void __user *, cifrada, unsigned long tamanho_cifrada, unsigned long tamanho_chave) {
+    
+    if (tamanho_chave < tamanho_cifrada) {
+    fprintf(stderr, "Erro: chave menor que a mensagem.\n");
+    exit(EXIT_FAILURE);
+    }
+
+
+    void *kmensagem;
+    *kmensagem = kmalloc(tamanho_cifrada, GFP_KERNEL);
+    if (!kmensagem)
+        return -ENOMEM;
+    if (copy_from_user(kmensagem, mensagem, tamanho_cifrada))
+        return -EFAULT;
+
+    void *kchave;
+    kchave = kmalloc(tamanho_chave, GFP_KERNEL);
+    if (!kchave)
+        return -ENOMEM;
+    if (copy_from_user(kchave, chave, tamanho_chave))
+        return -EFAULT;
+
+    void *kcifrada;
+    kcifrada = kmalloc(tamanho_cifrada, GFP_KERNEL);
+    if (!kcifrada)
+        return -ENOMEM;
+    if (copy_from_user(kcifrada, cifrada, tamanho_cifrada))
+        return -EFAULT;
+
+
+    for (unsigned long i = 0; i < tamanho_cifrada; i++) {
+        kcifrada[i] = kmensagem[i] ^ kchave[i];
+    }
+
+    if(copy_to_user(cifrada, kcifrada, tamanho_cifrada))
+        return -EFAULT;
+
+
+
+    kfree(kmensagem);
+    kfree(kchave);
+    kfree(kcifrada);
+
+}
+
+void get_mensagem_original(char *cifrada, char *chave, char *mensagem_decifrada, unsigned long tamanho_cifrada, unsigned long tamanho_chave) {
+    if (tamanho_chave < tamanho_cifrada) {
         fprintf(stderr, "Erro: chave menor que a mensagem.\n");
         exit(EXIT_FAILURE);
     }
-    for (size_t i = 0; i < tamanho_mensagem; i++) {
-        mensagem[i] = cifrada[i] ^ chave[i];
-    }
-    mensagem[tamanho_mensagem] = '\0';
-}
 
+    void *kcifrada;
+    kcifrada = kmalloc(tamanho_cifrada, GFP_KERNEL);
+    if (!kcifrada)
+        return -ENOMEM;
+    if (copy_from_user(kcifrada, cifrada, tamanho_cifrada))
+        return -EFAULT;
+
+    void *kchave;
+    kchave = kmalloc(tamanho_chave GFP_KERNEL);
+    if (!kchave)
+        return -ENOMEM;
+    if (copy_from_user(kchave, chave, tamanho_cifrada))
+        return -EFAULT;
+    
+    void *kmensagem;
+    kmensagem = kmalloc(tamanho_cifrada, GFP_KERNEL);
+    if (!kmensagem)
+        return -ENOMEM;
+
+    
+    for (size_t i = 0; i < tamanho_cifrada; i++) {
+        kmensagem[i] = kcifrada[i] ^ kchave[i];
+    }
+    kmensagem[tamanho_cifrada] = '\0';
+
+    if(copy_to_user(mensagem_decifrada, kmensagem, tamanho_cifrada))
+        return -EFAULT;
+    kfree(kcifrada);
+    kfree(kchave);
+    kfree(kmensagem);
+}
 int main() {
     char mensagem[256] = "ola mc504";
     char chave[256] =    "aaaaaaaaa";
