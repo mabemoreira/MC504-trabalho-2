@@ -3,7 +3,7 @@
 #include <string.h>
 #include <linux/syscalls.h>
 
-SYSCALL_DEFINE5(get_mensagem_original,  void __user * mensagem,  void __user * chave,  void __user * 
+SYSCALL_DEFINE5(get_mensagem_original, unsigned char __user * mensagem,  unsigned char __user * chave,  unsigned char __user * 
                 cifrada, unsigned long tamanho_cifrada,  unsigned long tamanho_chave){
 
     if (tamanho_chave < tamanho_cifrada) {
@@ -46,9 +46,9 @@ SYSCALL_DEFINE5(get_mensagem_original,  void __user * mensagem,  void __user * c
 
 }
 
-SYSCALL_DEFINE5(set_mensagem_cifrada, void __user * mensagem, void __user * chave, 
-    void __user * cifrada, unsigned long tamanho_cifrada, unsigned long tamanho_chave) {
-    
+SYSCALL_DEFINE5(set_mensagem_cifrada, unsigned char __user * mensagem, unsigned char __user * chave, 
+    unsigned char __user * cifrada, unsigned long tamanho_cifrada, unsigned long tamanho_chave) {
+
     if (tamanho_chave < tamanho_cifrada) {
     fprintf(stderr, "Erro: chave menor que a mensagem.\n");
     exit(EXIT_FAILURE);
