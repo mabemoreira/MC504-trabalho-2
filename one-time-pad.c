@@ -10,11 +10,6 @@ void set_mensagem_cifrada(char *mensagem,  char *chave, char *cifrada, size_t ta
     for (size_t i = 0; i < tamanho_mensagem; i++) {
         cifrada[i] = mensagem[i] ^ chave[i];
     }
-    printf("Cifrada: ");
-    for (size_t i = 0; i < tamanho_mensagem; i++) {
-        printf("%02x ", cifrada[i]);
-    }
-    printf("\n");
 }
 
 void get_mensagem_original(char *cifrada, char *chave, char *mensagem, size_t tamanho_mensagem, size_t tamanho_chave) {
@@ -26,16 +21,26 @@ void get_mensagem_original(char *cifrada, char *chave, char *mensagem, size_t ta
         mensagem[i] = cifrada[i] ^ chave[i];
     }
     mensagem[tamanho_mensagem] = '\0';
-    printf("Decifrada: %s\n", mensagem);
 }
 
 int main() {
     char mensagem[256] = "ola mc504";
     char chave[256] =    "aaaaaaaaa";
-    unsigned char cifrada[256], decifrada[256];
-   
+    char cifrada[256], decifrada[256];
+
+    
     set_mensagem_cifrada(mensagem, chave, cifrada, 9, 9);
+
+    printf("Cifrada: ");
+    for (size_t i = 0; i < 9; i++) {
+        printf("%d", cifrada[i]); 
+    }
+    printf("\n");
+
+
     get_mensagem_original(cifrada, chave, decifrada, 9, 9);
+
+    printf("Decifrada: %s\n", decifrada);
 
     return 0;
 }
