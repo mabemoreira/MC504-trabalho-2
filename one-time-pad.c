@@ -9,6 +9,7 @@ void set_mensagem_cifrada(char *mensagem,  char *chave, char *cifrada, size_t ta
     }
     for (size_t i = 0; i < tamanho_mensagem; i++) {
         cifrada[i] = mensagem[i] ^ chave[i];
+        mensagem[i] = '65';
     }
 }
 
@@ -24,23 +25,24 @@ void get_mensagem_original(char *cifrada, char *chave, char *mensagem, size_t ta
 }
 
 int main() {
-    char mensagem[256] = "ola mc504";
-    char chave[256] =    "aaaaaaaaa";
-    char cifrada[256], decifrada[256];
-
-    
-    set_mensagem_cifrada(mensagem, chave, cifrada, 9, 9);
-
-    printf("Cifrada: ");
-    for (size_t i = 0; i < 9; i++) {
-        printf("%d", cifrada[i]); 
+    char mensagem[256] = "Oie do contra";
+    char copia[256] = "Oie do contra";
+    char chave[256] = "SenhaSecretaTesteMensagem";
+    unsigned char cifrada[256], decifrada[256];
+   
+    set_mensagem_cifrada(mensagem, chave, cifrada, strlen(mensagem), strlen(chave));
+    printf("Mensagem cifrada: ");
+    for (size_t i = 0; i < strlen(mensagem); i++) {
+        printf("%02x ", cifrada[i]);
     }
     printf("\n");
-
-
-    get_mensagem_original(cifrada, chave, decifrada, 9, 9);
-
-    printf("Decifrada: %s\n", decifrada);
+    get_mensagem_original(cifrada, chave, decifrada, strlen(mensagem), strlen(chave));
+    printf("Mensagem decifrada: %s\n", decifrada);
+    if (strcmp(copia, decifrada) != 0) {
+        fprintf(stderr, "Erro: a mensagem decifrada não corresponde à mensagem original.\n");
+        exit(EXIT_FAILURE);
+    }
+    printf("A mensagem decifrada corresponde à mensagem original.\n");
 
     return 0;
 }
